@@ -1,0 +1,10 @@
+# Dolly 后端服务 (Linux 服务器)
+# 只包含 Web 框架和工具，不包含任何 ML 库
+
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+websockets==14.1
+python-dotenv==1.0.1
+pydantic==2.10.4
+pydantic-settings==2.6.1
+httpx==0.27.2

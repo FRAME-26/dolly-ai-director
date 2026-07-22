@@ -1,0 +1,12 @@
+# Dolly 客户端 - 视觉感知 + OBS 控制
+# 包含 YOLO、OpenCV、MediaPipe 等
+
+ultralytics==8.3.40
+opencv-python==4.10.0.84
+mediapipe==0.10.14
+silero-vad==5.1.2
+obs-websocket-py==0.7.0
+requests==2.32.3
+python-dotenv==1.0.1
+numpy==1.26.4
+sounddevice==0.4.6

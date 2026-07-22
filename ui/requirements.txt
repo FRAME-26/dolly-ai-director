@@ -1,0 +1,3 @@
+# Dolly 操作台 UI (Gradio)
+
+gradio==5.9.1
