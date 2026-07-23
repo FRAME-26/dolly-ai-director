@@ -21,3 +21,7 @@ env/
 *.onnx
 *.weights
 docs/*.pdf
+
+# Node (frontend/)
+node_modules/
+dist/

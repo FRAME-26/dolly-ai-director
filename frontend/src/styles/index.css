@@ -1,0 +1,45 @@
+/* Dolly V2 — design tokens verified against Figma file 1i1rFhuvgvWqFOr9TG4YXk */
+@import "@fontsource-variable/archivo";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+@import "tailwindcss";
+
+@theme {
+  --color-background: #f2f2ef;
+  --color-surface-dark: #080e46;
+  --color-surface-dark-2: #0b1670;
+  --color-brand-blue: #1b2fb4;
+  --color-primary: #9fb0f2;
+  --color-text-dark: #17171a;
+  --color-text-secondary: #5c5a52;
+  --color-text-on-dark: #c6cff7;
+  --color-text-muted-dark: #8fa0e8;
+  --color-danger: #c0392b;
+  --color-neutral-panel: #e6e5e0;
+  --color-neutral-muted: #a3a19a;
+  --color-timeline-silence: #6c7bd4;
+  --color-timeline-retake: #e08a7d;
+
+  --font-sans: "Archivo Variable", "Archivo", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-dark);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Keyboard focus without redesigning the approved buttons */
+:focus-visible {
+  outline: 2px solid var(--color-brand-blue);
+  outline-offset: 2px;
+}

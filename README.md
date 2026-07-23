@@ -22,9 +22,15 @@ dolly-ai-director/
 │   ├── obs_bridge/
 │   │   └── obs_controller.py   # obs-websocket-py control OBS
 │   └── requirements.txt    # Local deps (ultralytics, opencv, gradio...)
-├── ui/                 # Jeboy's Gradio dashboard
+├── ui/                 # Jeboy's Gradio dashboard (dev/ops console)
 │   ├── dashboard.py
 │   └── requirements.txt
+├── frontend/           # React 19 web UI (Dolly V2) — 通过 VITE_DOLLY_API 连后端
+│   ├── src/
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── .env.example    # VITE_DOLLY_API → 后端地址
+│   └── vercel.json     # Vercel 静态部署
 ├── docs/               # All PDFs / docs
 ├── deploy/             # 服务器部署文件 (systemd unit)
 │   └── dolly-backend.service
@@ -83,3 +89,28 @@ python dashboard.py
    ./update_server.sh
    # 或用环境变量覆盖：DEPLOY_DIR=/srv/dolly/backend ./update_server.sh
    ```
+
+## Frontend (React web UI)
+
+`frontend/` 是 Dolly V2 的网页端（React 19 + Vite + TS + Tailwind + XState），
+从 Figma 设计稿 1:1 实现。它**只**通过 `VITE_DOLLY_API` 连我们的 FastAPI 后端，
+不直接碰 OBS / 相机。不连后端时跑“诚实的 demo 模式”（mock 相机 + 浏览器语音）。
+
+```bash
+cd frontend
+pnpm install          # 需要 pnpm@11
+pnpm dev              # http://localhost:5173
+pnpm build            # 产物在 dist/，可丢 Vercel（vercel.json 已配）
+```
+
+后端要实现的接口（含 voice WebSocket / CORS / /health）见
+[`backend/API_CONTRACT.md`](backend/API_CONTRACT.md)。核心三件事：
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| WS | `/ws/voice` | 后端 → 前端推送语音识别事件 |
+| POST | `/export/otio` | 导出 OpenTimelineIO（送 Resolve） |
+| POST | `/export/publish` | 发布到社交平台 |
+
+前端通过 `frontend/.env` 的 `VITE_DOLLY_API` 指后端；本地默认 `http://localhost:8000`。
+
