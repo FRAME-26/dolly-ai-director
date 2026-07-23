@@ -1,0 +1,24 @@
+[Unit]
+Description=Dolly AI Director Backend
+After=network.target
+
+[Service]
+Type=simple
+# 改成你的部署用户/组（需对 /opt/dolly/backend 有读写权限）
+User=dolly
+Group=dolly
+WorkingDirectory=/opt/dolly/backend
+# 可选环境变量文件（不存在也不会报错，因为前面有 -）
+EnvironmentFile=-/opt/dolly/backend/.env
+# 纯 CPU 服务器：单 worker（决策引擎是有状态状态机，多 worker 会破坏内存状态）
+ExecStart=/opt/dolly/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+# 资源限制（按你的服务器规格调整）
+CPUQuota=200%
+MemoryMax=2G
+
+[Install]
+WantedBy=multi-user.target
