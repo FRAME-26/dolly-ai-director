@@ -39,6 +39,9 @@ dolly-ai-director/
 │   ├── decision.py      # 候选比较/reason 枚举/去抖
 │   ├── ws_client.py     # hello/heartbeat/decision + 重连退避
 │   ├── replay.py        # 离线回放(测试用)
+│   ├── tools/
+│   │   └── mock_backend.py  # Nero 后端的 mock (合成帧 + WS 安全裁决) — 本地自测用
+│   ├── ROADMAP.md       # 引擎实施 Roadmap (含 Step 0 冲突清理)
 │   └── requirements.txt
 ├── client/              # ⚠️ 与架构冲突, 待重构 (见下)
 ├── ui/                  # Jeboy 的 Gradio 操作台 (本地)
@@ -51,11 +54,14 @@ dolly-ai-director/
 └── README.md
 ```
 
-## ⚠️ 与早期 scaffold 的冲突（待团队确认）
+## ⚠️ 早期 scaffold 冲突（引擎代码已就位，待执行 Step 0 清理）
 
-1. **`backend/app/decision_engine.py` 放错了位置**：MCDA 打分 + 状态机属于 **AI 引擎**（`dolly-engine/scoring.py` + `decision.py`），不属于后端。后端的职责是 **安全裁决层**（`safety.py`：hold/cooldown/margin/health）对引擎提议做最终裁决。建议把 `decision_engine.py` 的逻辑迁到 `dolly-engine/`，后端改为 `safety.py`。
-2. **`client/` 当前内容冲突**：架构里 `camera_capture.py`(cv2 直开摄像头) 违反 "OBS 独占 UVC，引擎绝不直开摄像头"；YOLO 推理在 `dolly-engine/perception.py`；OBS 控制在后端。建议 `client/` 重构或清空，相关代码并入 `dolly-engine/`(感知) 与 `backend/`(OBS 桥)。
-3. **`frontend/` 的 API 契约与锁定合同不一致**：前端设计稿用 `/ws/voice`、`/export/otio`、`/export/publish`，但锁定合同是 `WS /ws/v1/engine` + `GET /api/v1/frames/{cam}.jpg`。需确认 `frontend/` 是否就是本地 Director Console，并把它对齐到 v1.0 合同（或明确它是另一套 V2 UI）。
+> 引擎本体（`dolly-engine/`）已于 7/23 集成，所有四层 + 降级 + WS 协议均已实现并通过 heuristic+mock 的端到端冒烟。
+> 下列遗留文件现已**冗余**，按 ROADMAP.md 的 Step 0 应**删除**（不迁移、不"先留着"）。
+
+1. **`backend/app/decision_engine.py` 应删除**：MCDA 打分 + 状态机已由 `dolly-engine/scoring.py` + `decision.py` 实现（在引擎侧）。后端只保留 **安全裁决层** `safety.py`（hold 2500 / cooldown 1500 / margin 0.12 / confidence 0.65 / health）。删除需确认后端无其它引用。
+2. **`client/` 应清空/归档**：其中 `camera_capture.py`(cv2 直开摄像头) 违反 "OBS 独占 UVC，引擎绝不直开摄像头"；YOLO 已在 `dolly-engine/perception.py`；OBS 控制在后端。建议整目录移至 `attic/` 或删除。
+3. **`frontend/` 的 API 契约与 v1.0 锁定合同不一致**：前端设计稿用 `/ws/voice`、`/export/otio`、`/export/publish`，而锁定合同是 `WS /ws/v1/engine` + `GET /api/v1/frames/{cam}.jpg`。**P0 红灯期间禁止触碰**；标注为 "V2 设计稿，7/26 之后再对齐"。本周 Console 只消费 `GET /api/v1/state` + `WS /ws/v1/ui`。
 
 ## Quick start
 
@@ -72,7 +78,12 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```bash
 cd dolly-engine
 pip install -r requirements.txt
-python main.py                    # WS 客户端连后端 /ws/v1/engine
+python main.py                    # 连 Nero 真后端 /ws/v1/engine (需先起 backend)
+
+# 不依赖 Nero 的本地自测（双终端）:
+#   终端A: uvicorn tools.mock_backend:app --port 8000
+#   终端B: python main.py --heuristic
+#   看到 "[mock] *** OBS SWITCH ***" 即整链打通
 ```
 
 ### 前端 Director Console — OBS 笔记本本地
