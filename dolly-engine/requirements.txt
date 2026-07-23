@@ -1,0 +1,10 @@
+# Dolly AI 引擎依赖 (4060 笔记本, 本地局域网)
+# 传输 / 工具
+httpx>=0.27
+websockets>=14.1
+python-dotenv>=1.0
+numpy>=1.26
+opencv-python>=4.10
+
+# 推理运行时 (TBD: 按 Ceaser 最终选型填版本)
+# 候选: torch / ultralytics(YOLOv8n|YOLO11n) / onnxruntime
